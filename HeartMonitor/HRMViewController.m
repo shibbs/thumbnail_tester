@@ -83,7 +83,9 @@ CBCharacteristic *tl_data_Characteristic;
     [peripheral setDelegate:self];
     [peripheral discoverServices:nil];
     self.connected = [NSString stringWithFormat:@"Connected: %@", peripheral.state == CBPeripheralStateConnected ? @"YES" : @"NO"];
+    [centralManager scanForPeripheralsWithServices:nil options:nil]; //search for all devices
     //check if we actually conected properly
+    /*
     if(peripheral.state == CBPeripheralStateConnected && self.alpine_peripheral != NULL){
         NSLog(@"RADIAN CONNECTION GOOD!!!");
         self.good_btn.hidden = NO;
@@ -94,7 +96,7 @@ CBCharacteristic *tl_data_Characteristic;
         self.alpine_peripheral = NULL; //null outt he alpine peripheral object
         self.good_btn.hidden = YES;
         self.bad_btn.hidden = NO;
-    }
+    } */
     
     NSLog(@"%@", self.connected);
 }

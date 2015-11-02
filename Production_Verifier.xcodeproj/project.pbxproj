@@ -42,7 +42,7 @@
 		35AFF68A185B691D00F1A64F /* HeartMonitor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HeartMonitor-Info.plist"; sourceTree = "<group>"; };
 		35AFF68C185B691D00F1A64F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		35AFF68E185B691D00F1A64F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		35AFF690185B691D00F1A64F /* HeartMonitor-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HeartMonitor-Prefix.pch"; sourceTree = "<group>"; };
+		35AFF690185B691D00F1A64F /* Production_Verifier.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Production_Verifier.pch; sourceTree = "<group>"; };
 		35AFF691185B691D00F1A64F /* HRMAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HRMAppDelegate.h; sourceTree = "<group>"; };
 		35AFF692185B691D00F1A64F /* HRMAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HRMAppDelegate.m; sourceTree = "<group>"; };
 		35AFF695185B691D00F1A64F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -132,7 +132,7 @@
 				35AFF68A185B691D00F1A64F /* HeartMonitor-Info.plist */,
 				35AFF68B185B691D00F1A64F /* InfoPlist.strings */,
 				35AFF68E185B691D00F1A64F /* main.m */,
-				35AFF690185B691D00F1A64F /* HeartMonitor-Prefix.pch */,
+				35AFF690185B691D00F1A64F /* Production_Verifier.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -208,7 +208,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "HeartMonitor" */;
+			buildConfigurationList = 35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "Production_Verifier" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -384,7 +384,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "HeartMonitor/HeartMonitor-Prefix.pch";
+				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				INFOPLIST_FILE = "HeartMonitor/HeartMonitor-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -397,7 +397,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "HeartMonitor/HeartMonitor-Prefix.pch";
+				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				INFOPLIST_FILE = "HeartMonitor/HeartMonitor-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -415,7 +415,7 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "HeartMonitor/HeartMonitor-Prefix.pch";
+				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -438,7 +438,7 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "HeartMonitor/HeartMonitor-Prefix.pch";
+				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				INFOPLIST_FILE = "HeartMonitorTests/HeartMonitorTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
@@ -449,7 +449,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "HeartMonitor" */ = {
+		35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "Production_Verifier" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				35AFF6AF185B691D00F1A64F /* Debug */,
@@ -465,6 +465,7 @@
 				35AFF6B3185B691D00F1A64F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		35AFF6B4185B691D00F1A64F /* Build configuration list for PBXNativeTarget "HeartMonitorTests" */ = {
 			isa = XCConfigurationList;
@@ -473,6 +474,7 @@
 				35AFF6B6185B691D00F1A64F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
