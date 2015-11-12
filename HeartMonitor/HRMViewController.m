@@ -114,6 +114,11 @@ CBCharacteristic *tl_data_Characteristic;
     }
 }
 
+- (void)targetMethod:(NSTimer*)theTimer{
+    NSLog(@"timer fired");
+    [self viewDidLoad]; //reload the view
+}
+
 
 // CBCentralManagerDelegate - This is called with the CBPeripheral class as its main input parameter. This contains most of the information there is to know about a BLE peripheral.
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI 
@@ -132,6 +137,8 @@ CBCharacteristic *tl_data_Characteristic;
         self.bad_btn.hidden = YES;
         [self.connection_info setText:@" Connection Secured"];
         [centralManager connectPeripheral:peripheral options:nil];
+        
+        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(targetMethod:) userInfo:NULL repeats:NO];
     }
 
 }

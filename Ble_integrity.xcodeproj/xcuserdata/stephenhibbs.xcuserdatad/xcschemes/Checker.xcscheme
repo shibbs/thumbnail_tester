@@ -17,7 +17,7 @@
                BlueprintIdentifier = "35AFF67E185B691D00F1A64F"
                BuildableName = "HeartMonitor.app"
                BlueprintName = "HeartMonitor"
-               ReferencedContainer = "container:Production_Verifier.xcodeproj">
+               ReferencedContainer = "container:Ble_integrity.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -31,7 +31,7 @@
                BlueprintIdentifier = "35AFF69F185B691D00F1A64F"
                BuildableName = "HeartMonitorTests.xctest"
                BlueprintName = "HeartMonitorTests"
-               ReferencedContainer = "container:Production_Verifier.xcodeproj">
+               ReferencedContainer = "container:Ble_integrity.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -49,7 +49,7 @@
                BlueprintIdentifier = "35AFF69F185B691D00F1A64F"
                BuildableName = "HeartMonitorTests.xctest"
                BlueprintName = "HeartMonitorTests"
-               ReferencedContainer = "container:Production_Verifier.xcodeproj">
+               ReferencedContainer = "container:Ble_integrity.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -59,14 +59,14 @@
             BlueprintIdentifier = "35AFF67E185B691D00F1A64F"
             BuildableName = "HeartMonitor.app"
             BlueprintName = "HeartMonitor"
-            ReferencedContainer = "container:Production_Verifier.xcodeproj">
+            ReferencedContainer = "container:Ble_integrity.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -82,7 +82,7 @@
             BlueprintIdentifier = "35AFF67E185B691D00F1A64F"
             BuildableName = "HeartMonitor.app"
             BlueprintName = "HeartMonitor"
-            ReferencedContainer = "container:Production_Verifier.xcodeproj">
+            ReferencedContainer = "container:Ble_integrity.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -101,7 +101,7 @@
             BlueprintIdentifier = "35AFF67E185B691D00F1A64F"
             BuildableName = "HeartMonitor.app"
             BlueprintName = "HeartMonitor"
-            ReferencedContainer = "container:Production_Verifier.xcodeproj">
+            ReferencedContainer = "container:Ble_integrity.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

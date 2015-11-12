@@ -84,7 +84,7 @@
 		35AFF676185B691D00F1A64F = {
 			isa = PBXGroup;
 			children = (
-				35AFF688185B691D00F1A64F /* HeartMonitor */,
+				35AFF688185B691D00F1A64F /* Production_Verify */,
 				35AFF6A7185B691D00F1A64F /* HeartMonitorTests */,
 				35AFF681185B691D00F1A64F /* Frameworks */,
 				35AFF680185B691D00F1A64F /* Products */,
@@ -111,7 +111,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		35AFF688185B691D00F1A64F /* HeartMonitor */ = {
+		35AFF688185B691D00F1A64F /* Production_Verify */ = {
 			isa = PBXGroup;
 			children = (
 				35AFF691185B691D00F1A64F /* HRMAppDelegate.h */,
@@ -123,6 +123,7 @@
 				35AFF689185B691D00F1A64F /* Supporting Files */,
 				35AFF6B7185B697000F1A64F /* Media.xcassets */,
 			);
+			name = Production_Verify;
 			path = HeartMonitor;
 			sourceTree = "<group>";
 		};
@@ -201,14 +202,14 @@
 			attributes = {
 				CLASSPREFIX = HRM;
 				LastUpgradeCheck = 0500;
-				ORGANIZATIONNAME = "Razeware LLC";
+				ORGANIZATIONNAME = "Alpine Labs LLC";
 				TargetAttributes = {
 					35AFF69F185B691D00F1A64F = {
 						TestTargetID = 35AFF67E185B691D00F1A64F;
 					};
 				};
 			};
-			buildConfigurationList = 35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "Production_Verifier" */;
+			buildConfigurationList = 35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "Ble_integrity" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -386,6 +387,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				INFOPLIST_FILE = "HeartMonitor/HeartMonitor-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alpinelabs.verifier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -399,6 +401,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				INFOPLIST_FILE = "HeartMonitor/HeartMonitor-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.alpinelabs.verifier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -449,7 +452,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "Production_Verifier" */ = {
+		35AFF67A185B691D00F1A64F /* Build configuration list for PBXProject "Ble_integrity" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				35AFF6AF185B691D00F1A64F /* Debug */,
