@@ -387,7 +387,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				INFOPLIST_FILE = "HeartMonitor/HeartMonitor-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alpinelabs.verifier;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alpinelabs.integrity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -401,7 +401,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HeartMonitor/Production_Verifier-Prefix.pch";
 				INFOPLIST_FILE = "HeartMonitor/HeartMonitor-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alpinelabs.verifier;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alpinelabs.integrity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

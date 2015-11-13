@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HeartMonitor/HRMViewController.m"
-            timestampString = "468538072.901529"
+            timestampString = "469141872.174278"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "260"
-            endingLineNumber = "260"
+            startingLineNumber = "339"
+            endingLineNumber = "339"
             landmarkName = "-ShutterButtonTouched:"
             landmarkType = "5">
          </BreakpointContent>
@@ -26,11 +26,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HeartMonitor/HRMViewController.m"
-            timestampString = "468538072.901529"
+            timestampString = "469141872.174278"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "279"
-            endingLineNumber = "279"
+            startingLineNumber = "358"
+            endingLineNumber = "358"
+            landmarkName = "-sendTestTLPacket"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "HeartMonitor/HRMViewController.m"
+            timestampString = "469141872.174278"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "370"
+            endingLineNumber = "370"
             landmarkName = "-TlButtonTouched:"
             landmarkType = "5">
          </BreakpointContent>
@@ -42,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HeartMonitor/HRMViewController.m"
-            timestampString = "468538072.901529"
+            timestampString = "469141872.174278"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
+            startingLineNumber = "365"
+            endingLineNumber = "365"
             landmarkName = "-TlButtonTouched:"
             landmarkType = "5">
          </BreakpointContent>
@@ -58,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HeartMonitor/HRMViewController.m"
-            timestampString = "468538072.901529"
+            timestampString = "469141872.174278"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "286"
-            endingLineNumber = "286"
+            startingLineNumber = "367"
+            endingLineNumber = "367"
             landmarkName = "-TlButtonTouched:"
             landmarkType = "5">
          </BreakpointContent>
@@ -74,27 +90,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HeartMonitor/HRMViewController.m"
-            timestampString = "468538072.901529"
+            timestampString = "469141872.174278"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "288"
-            endingLineNumber = "288"
-            landmarkName = "-TlButtonTouched:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "HeartMonitor/HRMViewController.m"
-            timestampString = "468538072.901529"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "292"
-            endingLineNumber = "292"
+            startingLineNumber = "371"
+            endingLineNumber = "371"
             landmarkName = "-TlButtonTouched:"
             landmarkType = "5">
          </BreakpointContent>

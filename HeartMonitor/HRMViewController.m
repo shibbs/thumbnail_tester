@@ -19,14 +19,25 @@
 
 
 CBCentralManager *centralManager;
-CBCharacteristic *shutterCharacteristic;
-CBCharacteristic *tl_data_Characteristic;
+CBCharacteristic *uart_in_Characteristic1;
+CBCharacteristic *uart_in_Characteristic2;
+CBCharacteristic *uart_in_Characteristic3;
+CBCharacteristic *uart_in_Characteristic4;
+CBCharacteristic *uart_in_Characteristic5;
+CBCharacteristic *uart_in_Characteristic6;
 
+NSMutableData  *TotalInArray ;
+int packetNumber= 0;   //packet number within this set of packets.
+int numPackets  = 9;   //number of packets sends to expect in this page
+int numPages    = 12;   //number of pages to expect
+int pageNumber  = 0;   //page number we're on now
 
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    TotalInArray =  [[NSMutableData alloc] init];
  
 	// Do any additional setup after loading the view, typically from a nib.
 	self.polarH7DeviceData = nil;
@@ -114,11 +125,6 @@ CBCharacteristic *tl_data_Characteristic;
     }
 }
 
-- (void)targetMethod:(NSTimer*)theTimer{
-    NSLog(@"timer fired");
-    [self viewDidLoad]; //reload the view
-}
-
 
 // CBCentralManagerDelegate - This is called with the CBPeripheral class as its main input parameter. This contains most of the information there is to know about a BLE peripheral.
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI 
@@ -137,8 +143,7 @@ CBCharacteristic *tl_data_Characteristic;
         self.bad_btn.hidden = YES;
         [self.connection_info setText:@" Connection Secured"];
         [centralManager connectPeripheral:peripheral options:nil];
-        
-        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(targetMethod:) userInfo:NULL repeats:NO];
+       
     }
 
 }
@@ -191,30 +196,113 @@ CBCharacteristic *tl_data_Characteristic;
     
     NSLog(@"found a service, Service ID is %@", service.UUID);
     
-    if ([service.UUID isEqual:[CBUUID UUIDWithString:BLE_SM_UUID_SERVICE]])  {  // 1
-        NSLog(@"in the TL service");
+    if ([service.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_SERVICE]])  {  // 1
+        NSLog(@"in the UART service");
         for (CBCharacteristic *aChar in service.characteristics)
         {
             NSLog(@"TL Service characteristic:%@", service.UUID);
-            // timelapse packet
-            if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_SM_UUID_TL_PKT_CHAR]]) { // 2
+            // uart characteristic
+            if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR1]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
-                tl_data_Characteristic = aChar;
-                NSLog(@"Found time lapse packet characteristic");
-            }
-            //shutter control characteristic
-            else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_SM_UUID_SHUTTER_CHAR]]) { // 3
-                shutterCharacteristic = aChar; //set the shutter characteristic
-                [self.alpine_peripheral readValueForCharacteristic:aChar];
-                NSLog(@"Found shutter control characteristic");
+                uart_in_Characteristic1 = aChar;
+                NSLog(@"Found uart in 1 packet characteristic");
+            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
+                [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
+                uart_in_Characteristic2 = aChar;
+                NSLog(@"Found uart in 2 packet characteristic");
+            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]) { // 2
+                [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
+                uart_in_Characteristic3 = aChar;
+                NSLog(@"Found uart in 3 packet characteristic");
+            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]) { // 2
+                [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
+                uart_in_Characteristic4 = aChar;
+                NSLog(@"Found uart in 4 packet characteristic");
+            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]) { // 2
+                [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
+                uart_in_Characteristic5 = aChar;
+                NSLog(@"Found uart in 5 packet characteristic");
+            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]) { // 2
+                [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
+                uart_in_Characteristic6 = aChar;
+                NSLog(@"Found uart in 6 packet characteristic");
             }
         }
     }
 }
- 
+
 // Invoked when you retrieve a specified characteristic's value, or when the peripheral device notifies your app that the characteristic's value has changed.
-- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error 
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)aChar error:(NSError *)error
 {
+//    NSLog(@"updated characteristic:%@", aChar.UUID);
+    long length = aChar.value.length;
+    NSData * data  =aChar.value;
+//    NSLog(@"DATA IN : %@", data);
+    
+    
+    // uart characteristic
+    if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR1]]) { // 2
+        const char* array_in = (const char*)[data bytes];
+        
+        if(pageNumber == 0 && packetNumber == 0 ){ //do some overhead stuff ont he first page
+                        //check if this is a legit first packet
+            if(array_in[0] ==0 && array_in[1] == 12) {
+                numPages = array_in[2];
+                NSLog(@"numPages : %d", numPages);
+            }else{
+                NSLog(@"Indexing is all fucked!!! ");
+                return;
+            }
+        }else if(packetNumber == 0){ //for a new page
+            if(array_in[1] ==12 && array_in[2] == numPages){
+                NSLog(@"Setting PageNumber. Was %d now is  %d", pageNumber, array_in[0]);
+                pageNumber = array_in[0]; //set our page number
+                
+                NSLog(@"TOTAL DATA ARRAY : %@",TotalInArray ) ;
+            }else{
+                NSLog(@"packetNumber is wrong! ");
+                return;
+            }
+        }
+        
+        [TotalInArray appendData:data];
+
+
+//        NSLog(@"Packet Num : %d", packetNumber);
+        packetNumber++;
+        
+        //check if we're done with this page
+        if(packetNumber > numPackets){
+            NSLog(@"Page Num : %d", pageNumber);
+            pageNumber++;
+            NSLog(@"DATA IN : %@", data);
+            packetNumber = 0;
+            //need the -1 since I made a mistake in page number counting beore
+            if(pageNumber >= numPages-1){
+                pageNumber = 0;
+                
+            }
+        }
+        
+//        NSLog(@"Got uart in 1 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
+        
+//        NSLog(@"Got uart in 2 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]) { // 2
+        
+//        NSLog(@"Got uart in 3 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]) { // 2
+        
+//        NSLog(@"Got uart in 4 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]) { // 2
+        
+//        NSLog(@"Got uart in 5 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]) { // 2
+        
+//        NSLog(@"Got uart in 6 packet Data Change");
+    }
+
+
 }
 
  - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
@@ -260,8 +348,8 @@ CBCharacteristic *tl_data_Characteristic;
     
   //  NSLog(@"Writing value for shutter characteristic");
     unsigned char bytes[] = {val};
-    NSData* dataToWrite = [NSData dataWithBytes:bytes length:sizeof(bytes)];
-    [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:shutterCharacteristic type :CBCharacteristicWriteWithResponse];
+//    NSData* dataToWrite = [NSData dataWithBytes:bytes length:sizeof(bytes)];
+//    [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:shutterCharacteristic type :CBCharacteristicWriteWithResponse];
 
 }
 - (void) sendTestTLPacket {
@@ -269,7 +357,7 @@ CBCharacteristic *tl_data_Characteristic;
     NSLog(@"Attempting to send the TL Packet");
     unsigned char bytes[] = {241,1,60,80,50,0,1,8,0,0,100,0,80,0,0,0,0,50,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,242};
     NSData* dataToWrite = [NSData dataWithBytes:bytes length:sizeof(bytes)];
-    [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:tl_data_Characteristic type :CBCharacteristicWriteWithResponse];
+//    [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:tl_data_Characteristic type :CBCharacteristicWriteWithResponse];
 }
 
 - (IBAction)TlButtonTouched:(id)sender {
@@ -291,7 +379,7 @@ CBCharacteristic *tl_data_Characteristic;
         NSData* dataToWrite = [NSData dataWithBytes:send_arr length:pkt_size+1];
         
         NSLog(@"sending pkt, len: %d, vals: %@", dataToWrite.length , dataToWrite);
-        [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:tl_data_Characteristic type :CBCharacteristicWriteWithResponse];
+//        [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:tl_data_Characteristic type :CBCharacteristicWriteWithResponse];
         NSLog(@"just sent # %d", send_arr[0]);
         sleep(.5);
       //  NSLog(@"done sleeping");
