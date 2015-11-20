@@ -28,6 +28,8 @@
 #define BLE_UART_IN_CHAR4      @"3035"
 #define BLE_UART_IN_CHAR5      @"3036"
 #define BLE_UART_IN_CHAR6      @"3037"
+#define BLE_UART_OUT      @"3030"
+
 
 
 #define POLARH7_HRM_DEVICE_INFO_SERVICE_UUID @"180A"       
