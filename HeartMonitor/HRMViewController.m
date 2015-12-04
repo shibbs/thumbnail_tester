@@ -25,14 +25,17 @@ CBCharacteristic *uart_in_Characteristic3;
 CBCharacteristic *uart_in_Characteristic4;
 CBCharacteristic *uart_in_Characteristic5;
 CBCharacteristic *uart_in_Characteristic6;
+
 CBCharacteristic *uart_out;
 
 NSMutableData  *TotalInArray ;
 int packetNumber= 0;   //packet number within this set of packets.
-int numPackets  = 12;   //number of packets sends to expect in this page
-int chunkNumber    = 0;    //chunk numver we're in
-int numChunks   = 4; //number of 0xFF chunks we expect
-
+int numPackets  = 9;   //number of packets sends to expect in this page
+int numPages    = 12;   //number of pages to expect
+int pageNumber  = 0;   //page number we're on now
+int chunkNumber = 0;    //chunk we're on now
+const int pageLength = 1024;
+int bytesReceived = 0;
 
 
 - (void)viewDidLoad
@@ -133,7 +136,7 @@ int numChunks   = 4; //number of 0xFF chunks we expect
 {
     NSString *localName = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
     NSLog(@"Found the peripheral: %@", localName);
-    if([localName  containsString:@"Radian2"]) { //FLAG SAH "Radian2"
+    if([localName  containsString:@"Radian2"]) {
         NSLog(@"FOUND RADIAN!!!");
     
         if(self.alpine_peripheral != NULL){
@@ -208,19 +211,7 @@ int numChunks   = 4; //number of 0xFF chunks we expect
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic1 = aChar;
                 NSLog(@"Found uart in 1 packet characteristic");
-            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_OUT]]) { // 2
-                [self.alpine_peripheral setNotifyValue:NO forCharacteristic:aChar];
-                uart_out = aChar;
-                NSLog(@"Found uart out packet characteristic");
-                
-                
-                UInt8 j= 0x04;
-                NSData *dt = [[NSData alloc] initWithBytes:&j length:sizeof(j)] ;
-                NSLog(@"Sending Chunk Ack..");
-                [self.alpine_peripheral writeValue:dt forCharacteristic:uart_out type :CBCharacteristicWriteWithoutResponse];
-                
-            }/*
-              else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
+            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic2 = aChar;
                 NSLog(@"Found uart in 2 packet characteristic");
@@ -240,7 +231,11 @@ int numChunks   = 4; //number of 0xFF chunks we expect
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic6 = aChar;
                 NSLog(@"Found uart in 6 packet characteristic");
-            } */
+            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_OUT]]) { // 2
+                [self.alpine_peripheral setNotifyValue:NO forCharacteristic:aChar];
+                uart_out = aChar;
+                NSLog(@"Found uart out packet characteristic");
+            }
         }
     }
 }
@@ -248,61 +243,92 @@ int numChunks   = 4; //number of 0xFF chunks we expect
 // Invoked when you retrieve a specified characteristic's value, or when the peripheral device notifies your app that the characteristic's value has changed.
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)aChar error:(NSError *)error
 {
+//    NSLog(@"updated characteristic:%@", aChar.UUID);
+    bool sendAck = false;
+    
+    long length = aChar.value.length;
+    NSData * data = aChar.value;
+    
     
     // uart characteristic
     if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR1]]) { // 2
-        
-        NSData * data  = aChar.value;
+        NSLog(@"Channel 1");
+
         const char* array_in = (const char*)[data bytes];
-        [TotalInArray appendData:data];
-//        NSLog(@"TOTAL DATA ARRAY : %@",TotalInArray ) ;
-        NSLog(@"New Data : %@",data ) ;
+        const char zero = 0, twelve = 12;
         
+        if(pageNumber == 0 && packetNumber == 0 ){ //do some overhead stuff ont he first page
+                        //check if this is a legit first packet
+            if(array_in[0] == zero && array_in[1] == twelve) {
+                numPages = array_in[2];
+                bytesReceived = 0; // Reset
+                NSLog(@"numPages : %d", numPages);
+            }
+        }else if(packetNumber == 0){ //for a new page
+            if(array_in[1] == twelve && array_in[2] == numPages){
+                NSLog(@"Setting PageNumber. Was %d now is  %d", pageNumber, array_in[0]);
+                pageNumber = array_in[0]; //set our page number
+                
+                NSLog(@"TOTAL DATA ARRAY : %@",TotalInArray ) ;
+            }else{
+                NSLog(@"packetNumber is wrong! ");c
+            }
+        }
+        
+        [TotalInArray appendData:data];
+
+
+//        NSLog(@"Packet Num : %d", packetNumber);
         packetNumber++;
         
-        //check if this is the first packet in our chunk
-        if(array_in[0] == 0xF0 && array_in[1] == 0x0B && array_in[2] == 0xCA ) {
-            chunkNumber = array_in[3]; //get the chunk number
+        //check if we're done with this page
+        if(packetNumber > numPackets){
+            NSLog(@"Page Num : %d", pageNumber);
+            pageNumber++;
+            NSLog(@"DATA IN : %@", data);
             packetNumber = 0;
-            NSLog(@"New CHunk!  : %d", chunkNumber);
-            if(chunkNumber == 0xFF){
-                NSLog(@"Last CHunk! ");
+            //need the -1 since I made a mistake in page number counting beore
+            if(pageNumber >= numPages-1){
+                pageNumber = 0;
                 
             }
         }
-        //if this is the last packet in a chunk then ack back
-        if(packetNumber == numPackets){
-            UInt8 j= 0x04;
-            NSData *dt = [[NSData alloc] initWithBytes:&j length:sizeof(j)] ;
-            NSLog(@"Sending Chunk Ack..");
-            [self.alpine_peripheral writeValue:dt forCharacteristic:uart_out type :CBCharacteristicWriteWithoutResponse];
-        }
-        
-        //check if we're at the last packet in the last Chunk
-        if(chunkNumber ==0xFF && packetNumber == numPackets) {
-            NSLog(@"Totally done!!  ");
-            NSLog(@"%@" , TotalInArray);
-            
-        }
         
 //        NSLog(@"Got uart in 1 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
+        NSLog(@"Channel 2");
+//        NSLog(@"Got uart in 2 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]) { // 2
+        NSLog(@"Channel 3");
+//        NSLog(@"Got uart in 3 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]) { // 2
+        NSLog(@"Channel 4");
+//        NSLog(@"Got uart in 4 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]) { // 2
+        NSLog(@"Channel 5");
+//        NSLog(@"Got uart in 5 packet Data Change");
+    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]) { // 2
+        NSLog(@"Channel 6");
+        sendAck = true;
     }
-//    else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
-//        
-////        NSLog(@"Got uart in 2 packet Data Change");
-//    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]) { // 2
-//        
-////        NSLog(@"Got uart in 3 packet Data Change");
-//    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]) { // 2
-//        
-////        NSLog(@"Got uart in 4 packet Data Change");
-//    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]) { // 2
-//        
-////        NSLog(@"Got uart in 5 packet Data Change");
-//    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]) { // 2
-//        
-////        NSLog(@"Got uart in 6 packet Data Change");
-//    }
+    
+    NSLog(@"DATA IN : %@", data);
+    
+    bytesReceived += length;
+    NSLog(@"BytesReceived: %d", bytesReceived);
+    if(bytesReceived == pageLength){
+        NSLog(@"Finished Page. Sending Ack.");
+        sendAck = true;
+        bytesReceived = 0;
+    }
+    
+    if(sendAck){
+        unsigned char bytes[] = {0xff, 0x04};
+        NSData* dataToWrite = [NSData dataWithBytes:bytes length:sizeof(bytes)];
+        [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:uart_out type :CBCharacteristicWriteWithResponse];
+        sendAck = false;
+    }
+    
 
 
 }
@@ -359,7 +385,7 @@ int numChunks   = 4; //number of 0xFF chunks we expect
     NSLog(@"Attempting to send the TL Packet");
     unsigned char bytes[] = {241,1,60,80,50,0,1,8,0,0,100,0,80,0,0,0,0,50,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,242};
     NSData* dataToWrite = [NSData dataWithBytes:bytes length:sizeof(bytes)];
-//    [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:tl_data_Characteristic type :CBCharacteristicWriteWithResponse];
+//    [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:tl_data_Characteristic type :CBCharacteristicWriteWithoutResponse];
 }
 
 - (IBAction)TlButtonTouched:(id)sender {
