@@ -1,3 +1,4 @@
+
 //
 //  HRMViewController.h
 //  HeartMonitor
@@ -56,6 +57,9 @@
 @property (nonatomic, strong) IBOutlet UITextView *deviceInfo;
 @property (strong, nonatomic) IBOutlet UITextView *connection_info;
 @property (strong, nonatomic) IBOutlet UIButton *good_btn;
+
+//@property (strong, nonatomic) IBOutlet UIImage *view;
+
 
 
 // Properties to hold data characteristics for the peripheral device

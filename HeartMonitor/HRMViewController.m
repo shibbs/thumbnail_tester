@@ -29,12 +29,11 @@ CBCharacteristic *uart_in_Characteristic6;
 CBCharacteristic *uart_out;
 
 NSMutableData  *TotalInArray ;
-int packetNumber= 0;   //packet number within this set of packets.
-int numPackets  = 9;   //number of packets sends to expect in this page
-int numPages    = 12;   //number of pages to expect
-int pageNumber  = 0;   //page number we're on now
-int chunkNumber = 0;    //chunk we're on now
-const int pageLength = 1024;
+int numPackets       = 9;   //number of packets sends to expect in this page
+int numPages         = 12;   //number of pages to expect
+int pageNumber       = 0;   //page number we're on now
+int chunkNumber      = 0;    //chunk we're on now
+const int pageLength = 1028;
 int bytesReceived = 0;
 
 
@@ -49,12 +48,7 @@ int bytesReceived = 0;
 	[self.view setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
 	[self.heartImage setImage:[UIImage imageNamed:@"HeartImage"]];
  
-	// Clear out textView
-//	[self.deviceInfo setText:@"hello world"];
-//	[self.deviceInfo setTextColor:[UIColor blueColor]];
-//	[self.deviceInfo setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
-//	[self.deviceInfo setFont:[UIFont fontWithName:@"Futura-CondensedMedium" size:25]];
-//	[self.deviceInfo setUserInteractionEnabled:NO];
+
  
 	// Create your Heart Rate BPM Label
 	self.heartRateBPM = [[UILabel alloc] initWithFrame:CGRectMake(55, 30, 75, 50)];
@@ -64,13 +58,6 @@ int bytesReceived = 0;
 	[self.heartImage addSubview:self.heartRateBPM];
     [self.heartRateBPM setUserInteractionEnabled:NO];
  
-	// Scan for all available CoreBluetooth LE devices
-/*	NSArray *services = @[[CBUUID UUIDWithString:POLARH7_HRM_HEART_RATE_SERVICE_UUID], [CBUUID UUIDWithString:POLARH7_HRM_DEVICE_INFO_SERVICE_UUID]];
-	CBCentralManager *centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
-	[centralManager scanForPeripheralsWithServices:services options:nil];
-	self.centralManager = centralManager;
-    */
-//    NSArray *services = @[[CBUUID UUIDWithString:MICHRON_BLE_1_BASIC_SERVICE_UUID] ];
 
     centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:nil];
     
@@ -78,9 +65,8 @@ int bytesReceived = 0;
     self.bad_btn.hidden = NO;
     self.alpine_peripheral = NULL; //null outt he alpine peripheral object
     
- //   [centralManager scanForPeripheralsWithServices:nil options:nil]; //search for all devices
 	self.centralManager = centralManager;
-    NSLog(@"started up");
+    NSLog(@"ed up");
  
 }
 
@@ -88,7 +74,6 @@ int bytesReceived = 0;
 {
     NSLog(@"got memory warning");
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - CBCentralManagerDelegate
@@ -99,21 +84,8 @@ int bytesReceived = 0;
     [peripheral setDelegate:self];
     [peripheral discoverServices:nil];
     self.connected = [NSString stringWithFormat:@"Connected: %@", peripheral.state == CBPeripheralStateConnected ? @"YES" : @"NO"];
-    [centralManager scanForPeripheralsWithServices:nil options:nil]; //search for all devices
-    //check if we actually conected properly
-    /*
-    if(peripheral.state == CBPeripheralStateConnected && self.alpine_peripheral != NULL){
-        NSLog(@"RADIAN CONNECTION GOOD!!!");
-        self.good_btn.hidden = NO;
-        self.bad_btn.hidden = YES;
-        [self.connection_info setText:@" Connection Secured"];
-    }else{
-        NSLog(@"RADIAN CONNECTION FAILED!!");
-        self.alpine_peripheral = NULL; //null outt he alpine peripheral object
-        self.good_btn.hidden = YES;
-        self.bad_btn.hidden = NO;
-    } */
     
+    [centralManager stopScan];
     NSLog(@"%@", self.connected);
 }
 
@@ -127,6 +99,8 @@ int bytesReceived = 0;
         self.alpine_peripheral = NULL; //null outt he alpine peripheral object
         self.good_btn.hidden = YES;
         self.bad_btn.hidden = NO;
+        
+        [centralManager scanForPeripheralsWithServices:nil options:nil];
     }
 }
 
@@ -136,16 +110,19 @@ int bytesReceived = 0;
 {
     NSString *localName = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
     NSLog(@"Found the peripheral: %@", localName);
-    if([localName  containsString:@"Radian2"]) {
-        NSLog(@"FOUND RADIAN!!!");
+    if([localName  containsString:@"AlpLab"]) {
+        NSLog(@"FOUND Test Device");
     
         if(self.alpine_peripheral != NULL){
-            NSLog(@"FOUND ANOTHER RADIAN ");
+            NSLog(@"FOUND ANOTHER Test Device ");
         }
+        
         self.alpine_peripheral = peripheral;
         peripheral.delegate = self;
+        
         self.good_btn.hidden = NO;
         self.bad_btn.hidden = YES;
+        
         [self.connection_info setText:@" Connection Secured"];
         [centralManager connectPeripheral:peripheral options:nil];
        
@@ -202,36 +179,44 @@ int bytesReceived = 0;
     NSLog(@"found a service, Service ID is %@", service.UUID);
     
     if ([service.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_SERVICE]])  {  // 1
+        
         NSLog(@"in the UART service");
         for (CBCharacteristic *aChar in service.characteristics)
         {
             NSLog(@"TL Service characteristic:%@", service.UUID);
+            
             // uart characteristic
             if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR1]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic1 = aChar;
                 NSLog(@"Found uart in 1 packet characteristic");
-            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
+            }
+            else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic2 = aChar;
                 NSLog(@"Found uart in 2 packet characteristic");
-            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]) { // 2
+            }
+            else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic3 = aChar;
                 NSLog(@"Found uart in 3 packet characteristic");
-            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]) { // 2
+            }
+            else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic4 = aChar;
                 NSLog(@"Found uart in 4 packet characteristic");
-            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]) { // 2
+            }
+            else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic5 = aChar;
                 NSLog(@"Found uart in 5 packet characteristic");
-            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]) { // 2
+            }
+            else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]) { // 2
                 [self.alpine_peripheral setNotifyValue:YES forCharacteristic:aChar];
                 uart_in_Characteristic6 = aChar;
                 NSLog(@"Found uart in 6 packet characteristic");
-            }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_OUT]]) { // 2
+            }
+            else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_OUT]]) { // 2
                 [self.alpine_peripheral setNotifyValue:NO forCharacteristic:aChar];
                 uart_out = aChar;
                 NSLog(@"Found uart out packet characteristic");
@@ -240,97 +225,119 @@ int bytesReceived = 0;
     }
 }
 
+bool chanHit[] = {false, false, false, false, false, false};
 // Invoked when you retrieve a specified characteristic's value, or when the peripheral device notifies your app that the characteristic's value has changed.
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)aChar error:(NSError *)error
 {
-//    NSLog(@"updated characteristic:%@", aChar.UUID);
     bool sendAck = false;
     
-    long length = aChar.value.length;
-    NSData * data = aChar.value;
+    NSMutableData * data = [aChar.value mutableCopy];
     
-    
-    // uart characteristic
-    if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR1]]) { // 2
-        NSLog(@"Channel 1");
+    if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR1]]) {
+        chanHit[0] = true;
 
         const char* array_in = (const char*)[data bytes];
         const char zero = 0, twelve = 12;
         
-        if(pageNumber == 0 && packetNumber == 0 ){ //do some overhead stuff ont he first page
+        if(pageNumber == 0 && chunkNumber == 0 ){ //do some overhead stuff ont he first page
                         //check if this is a legit first packet
             if(array_in[0] == zero && array_in[1] == twelve) {
                 numPages = array_in[2];
                 bytesReceived = 0; // Reset
                 NSLog(@"numPages : %d", numPages);
             }
-        }else if(packetNumber == 0){ //for a new page
+        
+        }else if(chunkNumber == 0){ //for a new page
             if(array_in[1] == twelve && array_in[2] == numPages){
-                NSLog(@"Setting PageNumber. Was %d now is  %d", pageNumber, array_in[0]);
-                pageNumber = array_in[0]; //set our page number
-                
-                NSLog(@"TOTAL DATA ARRAY : %@",TotalInArray ) ;
+                if (pageNumber != array_in[0])
+                    NSLog(@"pageNumber is wrong! [%d, %d]", pageNumber, array_in[0]);
             }else{
-                NSLog(@"packetNumber is wrong! ");c
+                NSLog(@"packetNumber is wrong! ");
             }
         }
         
-        [TotalInArray appendData:data];
+        if(chunkNumber == 0){
+            NSRange range = NSMakeRange(0, 3); // Strip the first three bytes off the start of the
+            [data replaceBytesInRange:range withBytes:NULL length:0];
+        }
 
-
-//        NSLog(@"Packet Num : %d", packetNumber);
-        packetNumber++;
-        
-        //check if we're done with this page
-        if(packetNumber > numPackets){
-            NSLog(@"Page Num : %d", pageNumber);
-            pageNumber++;
-            NSLog(@"DATA IN : %@", data);
-            packetNumber = 0;
-            //need the -1 since I made a mistake in page number counting beore
-            if(pageNumber >= numPages-1){
-                pageNumber = 0;
-                
+    }
+    else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]){
+        chanHit[1] = true;
+    }
+    else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]){
+        chanHit[2] = true;
+    }
+    else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]){
+        chanHit[3] = true;
+    }
+    else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]){
+        chanHit[4] = true;
+    }
+    else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]){
+        chanHit[5] = true;
+        for(int channel = 0; channel < 6; channel++){
+            if(!chanHit[channel]){
+                NSLog(@"We didn't receive anything on channel %d.", channel+1);
             }
         }
-        
-//        NSLog(@"Got uart in 1 packet Data Change");
-    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR2]]) { // 2
-        NSLog(@"Channel 2");
-//        NSLog(@"Got uart in 2 packet Data Change");
-    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR3]]) { // 2
-        NSLog(@"Channel 3");
-//        NSLog(@"Got uart in 3 packet Data Change");
-    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR4]]) { // 2
-        NSLog(@"Channel 4");
-//        NSLog(@"Got uart in 4 packet Data Change");
-    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR5]]) { // 2
-        NSLog(@"Channel 5");
-//        NSLog(@"Got uart in 5 packet Data Change");
-    }else if ([aChar.UUID isEqual:[CBUUID UUIDWithString:BLE_UART_IN_CHAR6]]) { // 2
-        NSLog(@"Channel 6");
         sendAck = true;
+        
+        NSLog(@"Finished Chunk %d. Sending Ack.", chunkNumber);
+        chunkNumber++;
     }
     
-    NSLog(@"DATA IN : %@", data);
+    long length = aChar.value.length;
     
     bytesReceived += length;
-    NSLog(@"BytesReceived: %d", bytesReceived);
+    //NSLog(@"Bytes Received: %d", bytesReceived);
+    
+    [TotalInArray appendData:data];
+    
     if(bytesReceived == pageLength){
-        NSLog(@"Finished Page. Sending Ack.");
+        NSLog(@"Finished Page %d. Sending Ack.", pageNumber);
         sendAck = true;
         bytesReceived = 0;
+        chunkNumber = 0;
+        
+        if(pageNumber == 0){ // Strip off the 12 bytes of junk + 1 byte of checksum on the first page
+            [TotalInArray setLength:[TotalInArray length] - 13];
+        }
+        else
+            [TotalInArray setLength:[TotalInArray length] - 1];
+        
+        pageNumber++;
+        if(pageNumber == numPages)
+        {
+            pageNumber = 0;
+            NSLog(@"Thumbnail transfer complete!");
+            NSLog(@"\r\n%@", TotalInArray);
+            
+
+            UIImage *image = [UIImage imageWithData:TotalInArray];
+            
+            UIImageView *myImageView = [[UIImageView alloc] initWithImage:image];
+            [self.view addSubview:myImageView];
+        }
+        
     }
     
     if(sendAck){
         unsigned char bytes[] = {0xff, 0x04};
+        
         NSData* dataToWrite = [NSData dataWithBytes:bytes length:sizeof(bytes)];
         [self.alpine_peripheral writeValue:dataToWrite forCharacteristic:uart_out type :CBCharacteristicWriteWithResponse];
+        
         sendAck = false;
+        
+        //Clear channel hits
+        for(int channel = 0; channel < 6; channel++){
+            chanHit[channel] = false;
+        }
     }
     
-
-
+    
+    
 }
 
  - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
