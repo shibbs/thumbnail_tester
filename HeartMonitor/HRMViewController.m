@@ -226,6 +226,9 @@ int bytesReceived = 0;
 }
 
 bool chanHit[] = {false, false, false, false, false, false};
+UIImageView *myImageView;
+UIImage *image;
+bool first = true;
 // Invoked when you retrieve a specified characteristic's value, or when the peripheral device notifies your app that the characteristic's value has changed.
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)aChar error:(NSError *)error
 {
@@ -249,8 +252,10 @@ bool chanHit[] = {false, false, false, false, false, false};
         
         }else if(chunkNumber == 0){ //for a new page
             if(array_in[1] == twelve && array_in[2] == numPages){
-                if (pageNumber != array_in[0])
+                if (pageNumber != array_in[0]){
                     NSLog(@"pageNumber is wrong! [%d, %d]", pageNumber, array_in[0]);
+                    NSLog(@"%@", data);
+                }
             }else{
                 NSLog(@"packetNumber is wrong! ");
             }
@@ -311,13 +316,29 @@ bool chanHit[] = {false, false, false, false, false, false};
         {
             pageNumber = 0;
             NSLog(@"Thumbnail transfer complete!");
-            NSLog(@"\r\n%@", TotalInArray);
+            //NSLog(@"\r\n%@", TotalInArray);
             
-
-            UIImage *image = [UIImage imageWithData:TotalInArray];
+            image = [UIImage imageWithData:TotalInArray];
             
-            UIImageView *myImageView = [[UIImageView alloc] initWithImage:image];
-            [self.view addSubview:myImageView];
+            if(first){
+                myImageView = [[UIImageView alloc] initWithImage:image];
+    
+                //change width of frame
+                CGRect frame = myImageView.frame;
+                frame.size.height = 200;
+                myImageView.frame = frame;
+                
+                //set contentMode to scale aspect to fit
+                myImageView.contentMode = UIViewContentModeScaleAspectFit;
+                myImageView.clipsToBounds = YES;
+                [self.view addSubview:myImageView];
+                first = false;
+            }
+            
+            else{
+                myImageView.image = image;
+                [self.view performSelectorOnMainThread:@selector(setNeedsLayout) withObject:nil waitUntilDone:NO];
+            }
         }
         
     }
